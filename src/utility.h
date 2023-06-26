@@ -2,66 +2,89 @@
 #include <string>
 #include <fstream>
 #include <iomanip>
+#include <vector>
+#include "var.h"
 
 using namespace std;
+
+string report;
 
 namespace utility {
 
     #include "var.h"
     using namespace var;
 
+    // Input Variables
+    int pilihan;
+    float pemasukan, pengeluaran;
+    string tanggal, target, kategori;
+
+    // Transaction History
     struct Transaksi {
-        double jumlah_pemasukkan;
-        double jumlah_pengeluaran;
-        double saldo;
-        string jenis_kategori;
         string tanggal;
+        string kategori;
+        float jumlah;
+        bool isPemasukan;
     };
 
-    struct Saldo {
-        double dana;
-    };
+    vector<Transaksi> riwayatTransaksi;
 
-    Transaksi laporanTransaksi;
-    Saldo dana;
+    void catatPemasukan() {
+        cout << "Masukkan jumlah uang yang ingin Anda masukkan: ";
+        cin >> pemasukan;
+        cout << "Masukkan tanggal transaksi (DD/MM/YYYY): ";
+        cin >> tanggal;
+        cout << "Masukkan kategori transaksi: ";
+        cin >> kategori;
 
-    double readSaldo() {
-        double saldoAkhir = 0;
+        saldo += pemasukan;
+        jumlah_pemasukkan += pemasukan;
+        pengeluaran_harian += pemasukan;
 
-        fstream fileLaporan;
+        Transaksi transaksi;
+        transaksi.tanggal = tanggal;
+        transaksi.kategori = kategori;
+        transaksi.jumlah = pemasukan;
+        transaksi.isPemasukan = true;
 
-        // open file
-        fileLaporan.open("data/laporan.txt", ios::in | ios::out | ios::binary);
+        riwayatTransaksi.push_back(transaksi);
 
-        int count = 0;
-        // baca file
-        while(!fileLaporan.eof()) {
+        cout << "Pemasukan berhasil dicatat." << endl;
+    }
 
-            if (count != 0) {
-                saldoAkhir += laporanTransaksi.saldo;
-            }
+    void catatPengeluaran() {
+        pengeluaran = 0; // Reset variabel pengeluaran
+        cout << "Masukkan jumlah uang yang ingin Anda keluarkan: ";
+        cin >> pengeluaran;
+        cout << "Masukkan tanggal transaksi (DD/MM/YYYY): ";
+        cin >> tanggal;
+        cout << "Masukkan kategori transaksi: ";
+        cin.ignore(); // Mengabaikan karakter newline (\n) di buffer
+        getline(cin, kategori);
 
-            fileLaporan.read(reinterpret_cast<char*>(&laporanTransaksi), sizeof(Transaksi));
+        saldo -= pengeluaran;
+        jumlah_pengeluaran += pengeluaran;
+        pengeluaran_harian += pengeluaran;
+        pengeluaran_mingguan += pengeluaran;
+        pengeluaran_bulanan += pengeluaran;
 
-            count++;
-        }
+        Transaksi transaksi;
+        transaksi.tanggal = tanggal;
+        transaksi.kategori = kategori;
+        transaksi.jumlah = pengeluaran;
+        transaksi.isPemasukan = false;
 
-        fileLaporan.close();
+        riwayatTransaksi.push_back(transaksi);
 
-        return saldoAkhir;
+        cout << "Pengeluaran berhasil dicatat." << endl;
     }
 
     // method transaksi
     void transaksi() {
 
         fstream fileLaporan;
-        fstream fileSaldo;
-
-        // open file laporan
-        fileLaporan.open("data/laporan.txt", ios::app | ios::in | ios::out | ios::binary);
 
         // masukkan tanggal transaksi
-        
         cout << "Masukkan tanggal transaksi (DD/MM/YYYY): ";
         cin >> laporanTransaksi.tanggal;
 
@@ -105,31 +128,12 @@ namespace utility {
         
         laporanTransaksi.jumlah_pemasukkan += pemasukkan;
         laporanTransaksi.jumlah_pengeluaran -= pengeluaran;
-        
-        // catat laporan
-        fileLaporan.write(reinterpret_cast<char*>(&laporanTransaksi), sizeof(Transaksi));
-
-        // close file laporan
-        fileLaporan.close();
 
         cout << "Transaksi berhasil dicatat." << endl;
     }
 
     // method analisis keuangan
     void analisisKeuangan() {
-        fstream fileLaporan;
-        double jumlahPengeluaran;
-        double rasio;
-        fileLaporan.open("data/laporan.txt", ios::in | ios::out | ios::binary);
-        int count = 0;
-        while(!fileLaporan.eof()) { 
-            if (count != 0) jumlah_pengeluaran += laporanTransaksi.jumlah_pengeluaran;
-            fileLaporan.read(reinterpret_cast<char*>(&laporanTransaksi), sizeof(Transaksi));
-        }
-        
-        rasio = (jumlahPengeluaran / readSaldo()) * 100;
-
-        cout << "rasio: " << fixed << setprecision(2) << rasio << endl;
 
     }
 
@@ -138,39 +142,17 @@ namespace utility {
 
     // method laporan
     void laporan() {
+        stringstream ss;
+        ss << "==== LAPORAN KEUANGAN ====\n";
+        ss << "Saldo terkini: Rp " << saldo << "\n";
+        ss << "Total pemasukan: Rp " << jumlah_pemasukkan << "\n";
+        ss << "Total pengeluaran: Rp " << jumlah_pengeluaran << "\n";
 
-        double saldoAkhir = 0;
-
-        fstream fileLaporan;
-        fstream fileSaldo;
-
-        // open file
-        fileLaporan.open("data/laporan.txt", ios::in | ios::out | ios::binary);
-
-        cout << " ==== LAPORAN KEUANGAN ==== " << endl;
-
-        int count = 0;
-        // baca file
-        while(!fileLaporan.eof()) {
-
-            if (count != 0) {
-                cout << "\nTransaksi ke - " << count << endl;
-                cout << "Jenis Kategori \t\t: " << laporanTransaksi.jenis_kategori << endl;
-                cout << "Jumlah Pemasukkan\t: " << laporanTransaksi.jumlah_pemasukkan << endl;
-                cout << "Jumlah Pengeluaran\t: " << laporanTransaksi.jumlah_pengeluaran << endl;
-                cout << "Saldo \t\t\t: " << laporanTransaksi.saldo << endl;
-                cout << "Tanggal \t\t: " << laporanTransaksi.tanggal << endl;
-
-                saldoAkhir += laporanTransaksi.saldo;
-            }
-
-            fileLaporan.read(reinterpret_cast<char*>(&laporanTransaksi), sizeof(Transaksi));
-
-            count++;
+        if (notif_target) {
+            ss << "Anda telah mencapai target pengeluaran atau pemasukan!\n";
         }
 
-        fileLaporan.close();
-
-        cout << "\nSaldo Saat ini: " << fixed << setprecision(0) << saldoAkhir << endl;
+        report = ss.str();
+        cout << laporan << endl;
     }
 }

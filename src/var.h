@@ -2,7 +2,7 @@
 
 namespace var {
     // Initialisasi variabel yang akan digunakan
-    double saldo            = 0; // saldo awal
+    double saldo               = 0; // saldo awal
     double jumlah_pengeluaran  = 0;
     double jumlah_pemasukkan   = 0;
     double pengeluaran_harian  = 0;
