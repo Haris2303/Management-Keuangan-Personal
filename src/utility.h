@@ -9,10 +9,10 @@ using namespace std;
 
 string report;
 
-namespace utility {
+#include "var.h"
+using namespace var;
 
-    #include "var.h"
-    using namespace var;
+namespace utility {
 
     // Input Variables
     int pilihan;
@@ -65,8 +65,6 @@ namespace utility {
         saldo -= pengeluaran;
         jumlah_pengeluaran += pengeluaran;
         pengeluaran_harian += pengeluaran;
-        pengeluaran_mingguan += pengeluaran;
-        pengeluaran_bulanan += pengeluaran;
 
         Transaksi transaksi;
         transaksi.tanggal = tanggal;
@@ -86,7 +84,7 @@ namespace utility {
 
         // masukkan tanggal transaksi
         cout << "Masukkan tanggal transaksi (DD/MM/YYYY): ";
-        cin >> laporanTransaksi.tanggal;
+        cin >> tanggal;
 
         // tampilkan kategori transaksi
         cout << "==== APLIKASI KEUANGAN ====" << endl;
