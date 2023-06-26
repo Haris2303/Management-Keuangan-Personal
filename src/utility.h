@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -10,20 +11,59 @@ namespace utility {
     using namespace var;
 
     struct Transaksi {
-        float jumlah_pemasukkan;
-        float jumlah_pengeluaran;
-        float saldo;
+        double jumlah_pemasukkan;
+        double jumlah_pengeluaran;
+        double saldo;
         string jenis_kategori;
         string tanggal;
     };
 
-    fstream fileLaporan;
+    struct Saldo {
+        double dana;
+    };
+
+    Transaksi laporanTransaksi;
+    Saldo dana;
+
+    double readSaldo() {
+        double saldoAkhir = 0;
+
+        fstream fileLaporan;
+
+        // open file
+        fileLaporan.open("data/laporan.txt", ios::in | ios::out | ios::binary);
+
+        int count = 0;
+        // baca file
+        while(!fileLaporan.eof()) {
+
+            if (count != 0) {
+                saldoAkhir += laporanTransaksi.saldo;
+            }
+
+            fileLaporan.read(reinterpret_cast<char*>(&laporanTransaksi), sizeof(Transaksi));
+
+            count++;
+        }
+
+        fileLaporan.close();
+
+        return saldoAkhir;
+    }
 
     // method transaksi
     void transaksi() {
+
+        fstream fileLaporan;
+        fstream fileSaldo;
+
+        // open file laporan
+        fileLaporan.open("data/laporan.txt", ios::app | ios::in | ios::out | ios::binary);
+
         // masukkan tanggal transaksi
+        
         cout << "Masukkan tanggal transaksi (DD/MM/YYYY): ";
-        cin >> tanggal;
+        cin >> laporanTransaksi.tanggal;
 
         // tampilkan kategori transaksi
         cout << "==== APLIKASI KEUANGAN ====" << endl;
@@ -37,13 +77,13 @@ namespace utility {
 
         switch (kategori) {
             case '1':
-                jenis_kategori = "Belanja Kebutuhan";
+                laporanTransaksi.jenis_kategori = "Belanja Kebutuhan";
                 break;
             case '2':
-                jenis_kategori = "Uang Kuliah";
+                laporanTransaksi.jenis_kategori = "Uang Kuliah";
                 break;
             case '3':
-                jenis_kategori = "Biaya Hiburan";
+                laporanTransaksi.jenis_kategori = "Biaya Hiburan";
                 break;
             default:
                 cout << "Kategori tidak ditemukkan!" << endl;
@@ -60,34 +100,77 @@ namespace utility {
 
         saldo += pemasukkan;
         saldo -= pengeluaran;
-        jumlah_pemasukkan += pemasukkan;
-        jumlah_pengeluaran -= pengeluaran;
 
-        Transaksi transaksi;
-        transaksi.jumlah_pemasukkan = jumlah_pemasukkan;
-        transaksi.jumlah_pengeluaran = jumlah_pengeluaran;
-        transaksi.saldo = saldo;
-        transaksi.jenis_kategori = jenis_kategori;
-        transaksi.tanggal = tanggal;
-
-        // open file laporan
-        fileLaporan.open("data/laporan.bin", ios::app | ios::in | ios::out | ios::binary);
-
+        laporanTransaksi.saldo = saldo;
+        
+        laporanTransaksi.jumlah_pemasukkan += pemasukkan;
+        laporanTransaksi.jumlah_pengeluaran -= pengeluaran;
+        
         // catat laporan
-        fileLaporan.write(reinterpret_cast<char*>(&transaksi), sizeof(Transaksi));
+        fileLaporan.write(reinterpret_cast<char*>(&laporanTransaksi), sizeof(Transaksi));
 
-        // close file 
+        // close file laporan
         fileLaporan.close();
 
         cout << "Transaksi berhasil dicatat." << endl;
     }
 
     // method analisis keuangan
-    void analisisKeuangan() {}
+    void analisisKeuangan() {
+        fstream fileLaporan;
+        double jumlahPengeluaran;
+        double rasio;
+        fileLaporan.open("data/laporan.txt", ios::in | ios::out | ios::binary);
+        int count = 0;
+        while(!fileLaporan.eof()) { 
+            if (count != 0) jumlah_pengeluaran += laporanTransaksi.jumlah_pengeluaran;
+            fileLaporan.read(reinterpret_cast<char*>(&laporanTransaksi), sizeof(Transaksi));
+        }
+        
+        rasio = (jumlahPengeluaran / readSaldo()) * 100;
+
+        cout << "rasio: " << fixed << setprecision(2) << rasio << endl;
+
+    }
 
     // method targetKeuangan
     void targetKeuangan() {}
 
     // method laporan
-    void laporan() {}
+    void laporan() {
+
+        double saldoAkhir = 0;
+
+        fstream fileLaporan;
+        fstream fileSaldo;
+
+        // open file
+        fileLaporan.open("data/laporan.txt", ios::in | ios::out | ios::binary);
+
+        cout << " ==== LAPORAN KEUANGAN ==== " << endl;
+
+        int count = 0;
+        // baca file
+        while(!fileLaporan.eof()) {
+
+            if (count != 0) {
+                cout << "\nTransaksi ke - " << count << endl;
+                cout << "Jenis Kategori \t\t: " << laporanTransaksi.jenis_kategori << endl;
+                cout << "Jumlah Pemasukkan\t: " << laporanTransaksi.jumlah_pemasukkan << endl;
+                cout << "Jumlah Pengeluaran\t: " << laporanTransaksi.jumlah_pengeluaran << endl;
+                cout << "Saldo \t\t\t: " << laporanTransaksi.saldo << endl;
+                cout << "Tanggal \t\t: " << laporanTransaksi.tanggal << endl;
+
+                saldoAkhir += laporanTransaksi.saldo;
+            }
+
+            fileLaporan.read(reinterpret_cast<char*>(&laporanTransaksi), sizeof(Transaksi));
+
+            count++;
+        }
+
+        fileLaporan.close();
+
+        cout << "\nSaldo Saat ini: " << fixed << setprecision(0) << saldoAkhir << endl;
+    }
 }
