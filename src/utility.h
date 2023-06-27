@@ -146,6 +146,7 @@ namespace utility {
     // method analisis keuangan
     void analisisKeuangan() {
         float rasio = (jumlah_pengeluaran / saldo) * 100;
+        // cek rasio keuangan
         if(rasio > 60) {
             cout << "Anda harus mengontrol keuangan!" << endl;
         } else {
@@ -158,16 +159,14 @@ namespace utility {
         // cek target 
         if(notif_target > 0) {
             cout << "Anda telah mempunyai target!" << endl;
-            // cek target
-            if(var::notif_target > 0) {
-                // cek apakah target terpenuhi
-                if(var::notif_target < var::saldo) { 
-                    cout << "Anda telah mencapai target pemasukan!" << endl;
-                    // hapus notif target
-                    notif_target = 0;
-                }
-                else { cout << "Target saat ini belum tercapai" << endl; }
+            // jika target telah terpenuhi
+            if(var::notif_target < var::saldo) { 
+                cout << "Anda telah mencapai target pemasukan!" << endl;
+                // hapus notif target
+                notif_target = 0;
             }
+            // jika target belum terpenuhi
+            else { cout << "Target saat ini belum tercapai" << endl; }
         } else {
             // Masukkan jumlah saldo target
             cout << "Masukkan saldo target: ";
