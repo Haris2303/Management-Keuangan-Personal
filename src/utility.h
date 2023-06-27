@@ -3,23 +3,18 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
-#include "var.h"
 
 using namespace std;
 
 string report;
 
-#include "var.h"
-using namespace var;
 
 namespace utility {
 
-    // Input Variables
-    int pilihan;
-    float pemasukan, pengeluaran;
-    string tanggal, target, kategori;
+    #include "var.h"
+    using namespace var;
 
-    // Transaction History
+    // Transaction
     struct Transaksi {
         string tanggal;
         string kategori;
@@ -31,20 +26,43 @@ namespace utility {
 
     void catatPemasukan() {
         cout << "Masukkan jumlah uang yang ingin Anda masukkan: ";
-        cin >> pemasukan;
+        cin >> pemasukkan;
         cout << "Masukkan tanggal transaksi (DD/MM/YYYY): ";
         cin >> tanggal;
-        cout << "Masukkan kategori transaksi: ";
+
+        // tampilkan kategori transaksi
+        cout << "==== KATEGORI TRANSAKSI ====" << endl;
+        cout << "1. Belanja Kebutuhan" << endl;
+        cout << "2. Uang Kuliah" << endl;
+        cout << "3. Biaya Hiburan" << endl;
+
+        // masukkan kategori transaksi
+        cout << "Pilih kategori transaksi (1-3): ";
         cin >> kategori;
 
-        saldo += pemasukan;
-        jumlah_pemasukkan += pemasukan;
-        pengeluaran_harian += pemasukan;
+        switch (kategori) {
+            case '1':
+                jenis_kategori = "Belanja Kebutuhan";
+                break;
+            case '2':
+                jenis_kategori = "Uang Kuliah";
+                break;
+            case '3':
+                jenis_kategori = "Biaya Hiburan";
+                break;
+            default:
+                cout << "Kategori tidak ditemukkan!" << endl;
+                break;
+        }
+
+        saldo += pemasukkan;
+        jumlah_pemasukkan += pemasukkan;
+        pengeluaran_harian += pemasukkan;
 
         Transaksi transaksi;
         transaksi.tanggal = tanggal;
-        transaksi.kategori = kategori;
-        transaksi.jumlah = pemasukan;
+        transaksi.kategori = jenis_kategori;
+        transaksi.jumlah = pemasukkan;
         transaksi.isPemasukan = true;
 
         riwayatTransaksi.push_back(transaksi);
@@ -58,36 +76,9 @@ namespace utility {
         cin >> pengeluaran;
         cout << "Masukkan tanggal transaksi (DD/MM/YYYY): ";
         cin >> tanggal;
-        cout << "Masukkan kategori transaksi: ";
-        cin.ignore(); // Mengabaikan karakter newline (\n) di buffer
-        getline(cin, kategori);
-
-        saldo -= pengeluaran;
-        jumlah_pengeluaran += pengeluaran;
-        pengeluaran_harian += pengeluaran;
-
-        Transaksi transaksi;
-        transaksi.tanggal = tanggal;
-        transaksi.kategori = kategori;
-        transaksi.jumlah = pengeluaran;
-        transaksi.isPemasukan = false;
-
-        riwayatTransaksi.push_back(transaksi);
-
-        cout << "Pengeluaran berhasil dicatat." << endl;
-    }
-
-    // method transaksi
-    void transaksi() {
-
-        fstream fileLaporan;
-
-        // masukkan tanggal transaksi
-        cout << "Masukkan tanggal transaksi (DD/MM/YYYY): ";
-        cin >> tanggal;
 
         // tampilkan kategori transaksi
-        cout << "==== APLIKASI KEUANGAN ====" << endl;
+        cout << "==== KATEGORI TRANSAKSI ====" << endl;
         cout << "1. Belanja Kebutuhan" << endl;
         cout << "2. Uang Kuliah" << endl;
         cout << "3. Biaya Hiburan" << endl;
@@ -98,45 +89,97 @@ namespace utility {
 
         switch (kategori) {
             case '1':
-                laporanTransaksi.jenis_kategori = "Belanja Kebutuhan";
+                jenis_kategori = "Belanja Kebutuhan";
                 break;
             case '2':
-                laporanTransaksi.jenis_kategori = "Uang Kuliah";
+                jenis_kategori = "Uang Kuliah";
                 break;
             case '3':
-                laporanTransaksi.jenis_kategori = "Biaya Hiburan";
+                jenis_kategori = "Biaya Hiburan";
                 break;
             default:
                 cout << "Kategori tidak ditemukkan!" << endl;
                 break;
         }
+        // cin.ignore(); // Mengabaikan karakter newline (\n) di buffer
+        // getline(cin, kategori);
 
-        // masukkan jumlah pemasukkan
-        cout << "Masukkan jumlah pemasukkan: ";
-        cin >> pemasukkan;
-
-        // masukkan jumlah pengeluaran
-        cout << "Masukkan jumlah pengeluaran: ";
-        cin >> pengeluaran;
-
-        saldo += pemasukkan;
         saldo -= pengeluaran;
+        jumlah_pengeluaran += pengeluaran;
+        pengeluaran_harian += pengeluaran;
 
-        laporanTransaksi.saldo = saldo;
-        
-        laporanTransaksi.jumlah_pemasukkan += pemasukkan;
-        laporanTransaksi.jumlah_pengeluaran -= pengeluaran;
+        Transaksi transaksi;
+        transaksi.tanggal = tanggal;
+        transaksi.kategori = jenis_kategori;
+        transaksi.jumlah = pengeluaran;
+        transaksi.isPemasukan = false;
 
-        cout << "Transaksi berhasil dicatat." << endl;
+        riwayatTransaksi.push_back(transaksi);
+
+        cout << "Pengeluaran berhasil dicatat." << endl;
+    }
+
+    // method transaksi
+    void transaksi() {
+        // tampilkan pilhan pemasukkan atau pengeluaran
+        cout << "==== PILIH TRANSAKSI ====" << endl;
+        cout << "1. Pemasukkan" << endl;
+        cout << "2. Pengeluaran" << endl;
+        cout << "3. Kembali" << endl;
+        cout << "Pilih (1-3)? :";
+        cin >> pilihan;
+
+        switch (pilihan) {
+            case '1':
+                catatPemasukan();
+                break;
+            case '2':
+                catatPengeluaran();
+                break;
+            case '3':
+                break;
+            default:
+                break;
+        }
     }
 
     // method analisis keuangan
     void analisisKeuangan() {
-
+        float rasio = (jumlah_pengeluaran / saldo) * 100;
+        if(rasio > 60) {
+            cout << "Anda harus mengontrol keuangan!" << endl;
+        } else {
+            cout << "Keuangan anda terkendali!" << endl;
+        }
     }
 
     // method targetKeuangan
-    void targetKeuangan() {}
+    void targetKeuangan() {
+        // cek target 
+        if(notif_target > 0) {
+            cout << "Anda telah mempunyai target!" << endl;
+            // cek target
+            if(var::notif_target > 0) {
+                // cek apakah target terpenuhi
+                if(var::notif_target < var::saldo) { 
+                    cout << "Anda telah mencapai target pemasukan!" << endl;
+                    // hapus notif target
+                    notif_target = 0;
+                }
+                else { cout << "Target saat ini belum tercapai" << endl; }
+            }
+        } else {
+            // Masukkan jumlah saldo target
+            cout << "Masukkan saldo target: ";
+            cin >> target;
+
+            // set notif target
+            notif_target = target;
+
+            cout << "Target anda telah tercatat!";
+        }
+        cout << notif_target << endl;
+    }
 
     // method laporan
     void laporan() {
@@ -146,11 +189,7 @@ namespace utility {
         ss << "Total pemasukan: Rp " << jumlah_pemasukkan << "\n";
         ss << "Total pengeluaran: Rp " << jumlah_pengeluaran << "\n";
 
-        if (notif_target) {
-            ss << "Anda telah mencapai target pengeluaran atau pemasukan!\n";
-        }
-
         report = ss.str();
-        cout << laporan << endl;
+        cout << report << endl;
     }
 }

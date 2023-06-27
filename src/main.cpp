@@ -4,16 +4,10 @@
 
 using namespace std;
 
-int main(int argc, char const *argv[])
+int main()
 {
     
     do {
-        // cek target
-        if(var::notif_target > 0) {
-            // cek apakah target terpenuhi
-            if(var::notif_target < 0) cout << "Anda telah mencapai target pemasukan!" << endl;
-            else cout << "Target saat ini belum tercapai" << endl;
-        }
 
         // munculkan menu pilihan
         cout << "==== APLIKASI KEUANGAN ====" << endl;
@@ -29,24 +23,24 @@ int main(int argc, char const *argv[])
 
         switch (var::pilihan) {
             case '1':
+                system("clear");
                 utility::transaksi();
                 break;
             case '2':
+                system("clear");
                 utility::analisisKeuangan();
                 break;
-
             case '3':
+                system("clear");
                 utility::targetKeuangan();
                 break;
-
             case '4':
+                system("clear");
                 utility::laporan();
                 break;
-
             case '5':
                 cout << "Terima kasih. Sampai jumpa lagi!" << endl;
                 return 0;
-
             default:
                 cout << "Input tidak valid. Silakan pilih menu 1-5." << endl;
                 break;
